@@ -1,28 +1,62 @@
-import pytest
-# TODO: add necessary import
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 
-# TODO: implement the first test. Change the function name and input as needed
-def test_one():
-    """
-    # add description for the first test
-    """
-    # Your code here
-    pass
+from ml.model import (
+    compute_model_metrics,
+    inference,
+    train_model,
+)
 
 
-# TODO: implement the second test. Change the function name and input as needed
-def test_two():
-    """
-    # add description for the second test
-    """
-    # Your code here
-    pass
+def test_compute_model_metrics():
+    """Verify precision, recall, and F1 against known results."""
+    labels = np.array([0, 1, 1, 0])
+    predictions = np.array([0, 1, 0, 0])
+
+    precision, recall, f1 = compute_model_metrics(
+        labels,
+        predictions,
+    )
+
+    assert precision == 1.0
+    assert recall == 0.5
+    assert round(f1, 4) == 0.6667
 
 
-# TODO: implement the third test. Change the function name and input as needed
-def test_three():
-    """
-    # add description for the third test
-    """
-    # Your code here
-    pass
+def test_train_model():
+    """Verify that training returns a fitted Random Forest classifier."""
+    features = np.array(
+        [
+            [0, 1],
+            [1, 0],
+            [1, 1],
+            [0, 0],
+        ]
+    )
+    labels = np.array([0, 1, 1, 0])
+
+    model = train_model(features, labels)
+
+    assert isinstance(model, RandomForestClassifier)
+    assert hasattr(model, "classes_")
+    assert set(model.classes_) == {0, 1}
+
+
+def test_inference():
+    """Verify that inference returns valid predictions of the right shape."""
+    features = np.array(
+        [
+            [0, 1],
+            [1, 0],
+            [1, 1],
+            [0, 0],
+        ]
+    )
+    labels = np.array([0, 1, 1, 0])
+
+    model = train_model(features, labels)
+    predictions = inference(model, features)
+
+    assert isinstance(predictions, np.ndarray)
+    assert predictions.shape == labels.shape
+    assert set(predictions).issubset({0, 1})
